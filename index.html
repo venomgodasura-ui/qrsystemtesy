@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Attendance — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #060a10;
+    --surface: #0d1520;
+    --surface2: #131e2e;
+    --border: rgba(0,210,255,0.12);
+    --accent: #00d2ff;
+    --accent2: #7b2fff;
+    --text: #e8f0fe;
+    --muted: #5a7090;
+    --success: #00ffb0;
+    --error: #ff4560;
+    --glow: 0 0 40px rgba(0,210,255,0.15);
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    overflow: hidden;
+  }
+
+  /* Animated grid background */
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,210,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,210,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: gridShift 20s linear infinite;
+  }
+
+  @keyframes gridShift {
+    0% { background-position: 0 0; }
+    100% { background-position: 40px 40px; }
+  }
+
+  /* Floating orbs */
+  .orb {
+    position: fixed; border-radius: 50%; filter: blur(80px); z-index: 0; pointer-events: none;
+  }
+  .orb1 { width: 400px; height: 400px; background: rgba(0,210,255,0.08); top: -100px; right: -100px; animation: orbFloat 8s ease-in-out infinite; }
+  .orb2 { width: 300px; height: 300px; background: rgba(123,47,255,0.1); bottom: -50px; left: -50px; animation: orbFloat 10s ease-in-out infinite reverse; }
+
+  @keyframes orbFloat {
+    0%, 100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(30px, -30px) scale(1.05); }
+  }
+
+  .page {
+    position: relative; z-index: 1;
+    height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .login-wrap {
+    width: 100%; max-width: 420px;
+    padding: 20px;
+    animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .brand {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .brand-icon {
+    width: 64px; height: 64px;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    box-shadow: 0 0 30px rgba(0,210,255,0.3);
+    animation: iconPulse 3s ease-in-out infinite;
+  }
+
+  @keyframes iconPulse {
+    0%, 100% { box-shadow: 0 0 30px rgba(0,210,255,0.3); }
+    50% { box-shadow: 0 0 50px rgba(0,210,255,0.5), 0 0 80px rgba(123,47,255,0.2); }
+  }
+
+  .brand h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px; font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  .brand p {
+    color: var(--muted); font-size: 12px;
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 36px;
+    backdrop-filter: blur(20px);
+    box-shadow: var(--glow), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  .field {
+    margin-bottom: 20px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .field-wrap {
+    position: relative;
+  }
+
+  .field-icon {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--muted); font-size: 16px; pointer-events: none;
+    transition: color 0.2s;
+  }
+
+  .field input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 14px 14px 42px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,210,255,0.1);
+  }
+
+  .field input:focus ~ .field-icon,
+  .field-wrap:focus-within .field-icon {
+    color: var(--accent);
+  }
+
+  .btn-login {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 12px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    position: relative; overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.2s;
+    margin-top: 8px;
+  }
+
+  .btn-login::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.1);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .btn-login:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(0,210,255,0.3); }
+  .btn-login:hover::before { opacity: 1; }
+  .btn-login:active { transform: translateY(0); }
+
+  .btn-login.loading .btn-text { opacity: 0; }
+  .btn-login.loading .btn-spinner { opacity: 1; }
+
+  .btn-text { transition: opacity 0.2s; }
+  .btn-spinner {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s;
+  }
+
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-msg {
+    background: rgba(255,69,96,0.1);
+    border: 1px solid rgba(255,69,96,0.3);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--error);
+    margin-top: 16px;
+    display: none;
+    align-items: center; gap: 8px;
+    animation: shake 0.4s ease;
+  }
+
+  .error-msg.show { display: flex; }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+  }
+
+  .footer-note {
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 24px;
+    letter-spacing: 1px;
+  }
+
+  /* Scan lines effect */
+  .scanlines {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.05) 2px,
+      rgba(0,0,0,0.05) 4px
+    );
+  }
+</style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="scanlines"></div>
+
+  <div class="page">
+    <div class="login-wrap">
+      <div class="brand">
+        <div class="brand-icon">📡</div>
+        <h1>QR Attendance</h1>
+        <p>Admin Portal</p>
+      </div>
+
+      <div class="card">
+        <div class="field">
+          <label>Username</label>
+          <div class="field-wrap">
+            <input type="text" id="user" placeholder="Enter username" autocomplete="off" onkeydown="if(event.key==='Enter')login()">
+            <span class="field-icon">◈</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <div class="field-wrap">
+            <input type="password" id="pass" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()">
+            <span class="field-icon">◉</span>
+          </div>
+        </div>
+
+        <button class="btn-login" id="loginBtn" onclick="login()">
+          <span class="btn-text">Access Dashboard →</span>
+          <span class="btn-spinner"><div class="spinner"></div></span>
+        </button>
+
+        <div class="error-msg" id="errMsg">
+          <span>✕</span> <span>Invalid credentials. Please try again.</span>
+        </div>
+      </div>
+
+      <p class="footer-note">SECURE · ENCRYPTED · REAL-TIME</p>
+    </div>
+  </div>
+
+<script>
+function login() {
+  const u = document.getElementById('user').value.trim();
+  const p = document.getElementById('pass').value;
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('errMsg');
+
+  err.classList.remove('show');
+  btn.classList.add('loading');
+
+  setTimeout(() => {
+    if (u === 'Abhishek1' && p === 'Abhishek2') {
+      localStorage.setItem('qr_login', 'true');
+      window.location.href = 'dashboard.html';
+    } else {
+      btn.classList.remove('loading');
+      err.classList.add('show');
+      document.getElementById('pass').value = '';
+    }
+  }, 700);
+}
+</script>
+</body>
+</html>
