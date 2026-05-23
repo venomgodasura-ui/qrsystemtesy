@@ -144,24 +144,6 @@
     50% { opacity: 0.3; box-shadow: none; }
   }
 
-  .btn-logout {
-    background: rgba(255,69,96,0.1);
-    border: 1px solid rgba(255,69,96,0.25);
-    border-radius: 10px;
-    padding: 8px 14px;
-    color: var(--error);
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.5px;
-  }
-
-  .btn-logout:hover {
-    background: rgba(255,69,96,0.2);
-    border-color: rgba(255,69,96,0.5);
-  }
-
   /* STATS ROW */
   .stats-row {
     display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
@@ -674,7 +656,7 @@
     <div class="header-right">
       <div class="live-badge"><div class="live-dot"></div> LIVE</div>
       <div class="clock-display" id="clock">--:--:--</div>
-      <button class="btn-logout" onclick="logout()">⏻ Logout</button>
+
     </div>
   </header>
 
@@ -777,11 +759,6 @@
 </div>
 
 <script>
-// AUTH GUARD
-if (localStorage.getItem('qr_login') !== 'true') {
-  window.location.href = 'index.html';
-}
-
 // STUDENT DATABASE — Add more students here
 const students = {
   'STU001': 'npc1',
@@ -963,10 +940,7 @@ function downloadCSV() {
   showToast('success', 'CSV Exported', `${present} records downloaded`);
 }
 
-function logout() {
-  localStorage.removeItem('qr_login');
-  window.location.href = 'index.html';
-}
+
 
 // INIT SCANNER
 function initScanner() {
